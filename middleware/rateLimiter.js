@@ -1,7 +1,11 @@
 const moment = require("moment");
 const redis = require("redis");
 
-const redisClient = redis.createClient();
+const redisClient = redis.createClient(process.env.REDIS_URL, {
+	tls: {
+		rejectUnauthorized: false,
+	},
+});
 const WINDOW_SIZE_IN_HOURS = 24;
 const MAX_WINDOW_REQUEST_COUNT = 10;
 const WINDOW_LOG_INTERVAL_IN_HOURS = 1;
