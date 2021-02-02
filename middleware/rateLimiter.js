@@ -7,7 +7,7 @@ const redis = require("redis");
 // 	},
 // });
 
-const redisClient;
+let redisClient;
 if (process.env.REDISTOGO_URL) {
 	let rtg = require("url").parse(process.env.REDISTOGO_URL);
 	redisClient = redis.createClient(rtg.port, rtg.hostname);
