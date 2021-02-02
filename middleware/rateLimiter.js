@@ -1,11 +1,11 @@
 const moment = require("moment");
 const redis = require("redis");
 
-const redisClient = redis.createClient(process.env.REDIS_URL, {
-	tls: {
-		rejectUnauthorized: false,
-	},
-});
+// const redisClient = redis.createClient(process.env.REDIS_URL, {
+// 	tls: {
+// 		rejectUnauthorized: false,
+// 	},
+// });
 
 const redisClient;
 if (process.env.REDISTOGO_URL) {
