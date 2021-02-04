@@ -1,12 +1,6 @@
 const moment = require("moment");
 const redis = require("redis");
 
-// const redisClient = redis.createClient(process.env.REDIS_URL, {
-// 	tls: {
-// 		rejectUnauthorized: false,
-// 	},
-// });
-
 let redisClient;
 if (process.env.REDISTOGO_URL) {
 	let rtg = require("url").parse(process.env.REDISTOGO_URL);
@@ -15,9 +9,11 @@ if (process.env.REDISTOGO_URL) {
 } else {
 	redisClient = redis.createClient();
 }
-const WINDOW_SIZE_IN_HOURS = 24;
+
+//the constraint would be 10 requests per hour for each ip
+const WINDOW_SIZE_IN_HOURS = 1;
 const MAX_WINDOW_REQUEST_COUNT = 10;
-const WINDOW_LOG_INTERVAL_IN_HOURS = 1;
+const WINDOW_LOG_INTERVAL_IN_HOURS = 1 / 12; //5 minutes
 
 const customRedisRateLimiter = (req, res, next) => {
 	try {
@@ -28,12 +24,9 @@ const customRedisRateLimiter = (req, res, next) => {
 		// fetch records of current user using IP address, returns null when no record is found
 		redisClient.get(req.ip, function (err, record) {
 			if (err) throw err;
-			console.log(req.ip);
 			const currentRequestTime = moment();
-			console.log(record);
 			//  if no record is found , create a new record for user and store to redis
 			if (record === null) {
-				console.log("in here");
 				let newRecord = [];
 				let requestLog = {
 					requestTimeStamp: currentRequestTime.unix(),
@@ -51,7 +44,7 @@ const customRedisRateLimiter = (req, res, next) => {
 			let requestsWithinWindow = data.filter((entry) => {
 				return entry.requestTimeStamp > windowStartTimestamp;
 			});
-			console.log("requestsWithinWindow", requestsWithinWindow);
+			// console.log("requestsWithinWindow", requestsWithinWindow);
 			let totalWindowRequestsCount = requestsWithinWindow.reduce(
 				(accumulator, entry) => {
 					return accumulator + entry.requestCount;
@@ -59,8 +52,8 @@ const customRedisRateLimiter = (req, res, next) => {
 				0
 			);
 
-			// if number of requests made is greater than or equal to the desired maximum, return error
-			if (totalWindowRequestsCount >= MAX_WINDOW_REQUEST_COUNT) {
+			// if number of requests made is greater than the desired maximum, return error
+			if (totalWindowRequestsCount > MAX_WINDOW_REQUEST_COUNT) {
 				res.status(429).json({
 					error: `You have exceeded the ${MAX_WINDOW_REQUEST_COUNT} requests in ${WINDOW_SIZE_IN_HOURS} hrs limit!`,
 				});
@@ -80,12 +73,12 @@ const customRedisRateLimiter = (req, res, next) => {
 					data[data.length - 1] = lastRequestLog;
 				} else {
 					//  if interval has passed, log new entry for current user and timestamp
-					data.push({
+					requestsWithinWindow.push({
 						requestTimeStamp: currentRequestTime.unix(),
 						requestCount: 1,
 					});
 				}
-				redisClient.set(req.ip, JSON.stringify(data));
+				redisClient.set(req.ip, JSON.stringify(requestsWithinWindow));
 				next();
 			}
 		});

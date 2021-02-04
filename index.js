@@ -1,5 +1,4 @@
 const express = require("express");
-const pg = require("pg");
 const dotenv = require("dotenv");
 const statsRoutes = require("./routes/statsRoutes");
 const eventsRoutes = require("./routes/eventsRoutes");
@@ -9,17 +8,6 @@ const rateLimiter = require("./middleware/rateLimiter");
 dotenv.config();
 
 const app = express();
-// configs come from standard PostgreSQL env vars
-// https://www.postgresql.org/docs/9.6/static/libpq-envars.html
-const pool = new pg.Pool();
-
-const queryHandler = (req, res, next) => {
-	pool.query(req.sqlQuery)
-		.then((r) => {
-			return res.json(r.rows || []);
-		})
-		.catch(next);
-};
 
 app.use(rateLimiter.customRedisRateLimiter);
 
@@ -30,79 +18,6 @@ app.get("/", (req, res) => {
 app.use("/events/", eventsRoutes);
 app.use("/stats/", statsRoutes);
 app.use("/poi/", poiRoutes);
-
-// app.get(
-// 	"/events/hourly",
-// 	(req, res, next) => {
-// 		req.sqlQuery = `
-//     SELECT date, hour, events
-//     FROM public.hourly_events
-//     ORDER BY date, hour
-//     LIMIT 168;
-//   `;
-// 		return next();
-// 	},
-// 	queryHandler
-// );
-
-// app.get(
-// 	"/events/daily",
-// 	(req, res, next) => {
-// 		req.sqlQuery = `
-//     SELECT date, SUM(events) AS events
-//     FROM public.hourly_events
-//     GROUP BY date
-//     ORDER BY date
-//     LIMIT 7;
-//   `;
-// 		return next();
-// 	},
-// 	queryHandler
-// );
-
-// app.get(
-// 	"/stats/hourly",
-// 	(req, res, next) => {
-// 		req.sqlQuery = `
-//     SELECT date, hour, impressions, clicks, revenue
-//     FROM public.hourly_stats
-//     ORDER BY date, hour
-//     LIMIT 168;
-//   `;
-// 		return next();
-// 	},
-// 	queryHandler
-// );
-
-// app.get(
-// 	"/stats/daily",
-// 	(req, res, next) => {
-// 		req.sqlQuery = `
-//     SELECT date,
-//         SUM(impressions) AS impressions,
-//         SUM(clicks) AS clicks,
-//         SUM(revenue) AS revenue
-//     FROM public.hourly_stats
-//     GROUP BY date
-//     ORDER BY date
-//     LIMIT 7;
-//   `;
-// 		return next();
-// 	},
-// 	queryHandler
-// );
-
-// app.get(
-// 	"/poi",
-// 	(req, res, next) => {
-// 		req.sqlQuery = `
-//     SELECT *
-//     FROM public.poi;
-//   `;
-// 		return next();
-// 	},
-// 	queryHandler
-// );
 
 app.listen(process.env.PORT || 5555, (err) => {
 	if (err) {
