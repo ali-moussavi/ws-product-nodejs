@@ -7,11 +7,11 @@ const router = express.Router();
 module.exports = router;
 
 //@desc fetch daily events
-//@route  GET /events/daily
+//@route  GET api/events/daily
 
 router.get("/daily", eventsControllers.getDailyEvents, db.queryHandler);
 
 //@desc fetch hourly events
-//@route  GET /events/hourly
+//@route  GET api/events/hourly
 
 router.get("/hourly", eventsControllers.getHourlyEvents, db.queryHandler);

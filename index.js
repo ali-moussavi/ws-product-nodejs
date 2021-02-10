@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const dotenv = require("dotenv");
 const statsRoutes = require("./routes/statsRoutes");
 const eventsRoutes = require("./routes/eventsRoutes");
@@ -15,9 +16,9 @@ app.get("/", (req, res) => {
 	res.send("Welcome to EQ Works 😎");
 });
 
-app.use("/events/", eventsRoutes);
-app.use("/stats/", statsRoutes);
-app.use("/poi/", poiRoutes);
+app.use("api/events/", eventsRoutes);
+app.use("api/stats/", statsRoutes);
+app.use("api/poi/", poiRoutes);
 
 if (process.env.NODE_ENV === "production") {
 	app.use(express.static(path.join("public")));

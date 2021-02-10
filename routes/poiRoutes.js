@@ -7,6 +7,6 @@ const router = express.Router();
 module.exports = router;
 
 //@desc fetch all POIs
-//@route  GET /poi
+//@route  GET api/poi
 
 router.get("", poiControllers.getPoi, db.queryHandler);
