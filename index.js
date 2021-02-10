@@ -19,6 +19,13 @@ app.use("/events/", eventsRoutes);
 app.use("/stats/", statsRoutes);
 app.use("/poi/", poiRoutes);
 
+if (process.env.NODE_ENV === "production") {
+	app.use(express.static(path.join("public")));
+	app.get("*", (req, res, next) => {
+		res.sendFile(path.resolve(__dirname, "public", "index.html"));
+	});
+}
+
 app.listen(process.env.PORT || 5555, (err) => {
 	if (err) {
 		console.error(err);
