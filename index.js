@@ -16,9 +16,9 @@ app.get("/api", (req, res) => {
 	res.send("Welcome to EQ Works 😎");
 });
 
-app.use("api/events/", eventsRoutes);
-app.use("api/stats/", statsRoutes);
-app.use("api/poi/", poiRoutes);
+app.use("/api/events/", eventsRoutes);
+app.use("/api/stats/", statsRoutes);
+app.use("/api/poi/", poiRoutes);
 
 if (process.env.NODE_ENV === "production") {
 	app.use(express.static(path.join("public")));

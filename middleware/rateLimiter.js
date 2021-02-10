@@ -10,9 +10,9 @@ if (process.env.REDISTOGO_URL) {
 	redisClient = redis.createClient();
 }
 
-//the constraint would be 10 requests per hour for each ip
+//the constraint would be 30 requests per hour for each ip
 const WINDOW_SIZE_IN_HOURS = 1;
-const MAX_WINDOW_REQUEST_COUNT = 10;
+const MAX_WINDOW_REQUEST_COUNT = 30;
 const WINDOW_LOG_INTERVAL_IN_HOURS = 1 / 12; //5 minutes
 
 const customRedisRateLimiter = (req, res, next) => {
