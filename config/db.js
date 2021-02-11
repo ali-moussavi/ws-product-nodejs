@@ -4,11 +4,15 @@ const pg = require("pg");
 // https://www.postgresql.org/docs/9.6/static/libpq-envars.html
 const pool = new pg.Pool();
 const queryHandler = (req, res, next) => {
+	console.log(req.sqlQuery);
 	pool.query(req.sqlQuery)
 		.then((r) => {
 			return res.json(r.rows || []);
 		})
-		.catch(next);
+		.catch((err) => {
+			console.log(err);
+			next(err);
+		});
 };
 
 module.exports = { queryHandler };

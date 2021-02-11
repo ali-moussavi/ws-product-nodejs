@@ -9,6 +9,7 @@ const getHourlyEvents = (req, res, next) => {
 	return next();
 };
 const getDailyEvents = (req, res, next) => {
+	console.log("in daily events");
 	req.sqlQuery = `
 	SELECT poi.name , dailyEvents.*
 	FROM public.poi 

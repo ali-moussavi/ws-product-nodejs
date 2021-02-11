@@ -10,7 +10,7 @@ dotenv.config();
 
 const app = express();
 
-// app.use(rateLimiter.customRedisRateLimiter);
+app.use(rateLimiter.customRedisRateLimiter);
 
 app.get("/api", (req, res) => {
 	res.send("Welcome to EQ Works 😎");
