@@ -7,6 +7,7 @@ const queryHandler = (req, res, next) => {
 	console.log(req.sqlQuery);
 	pool.query(req.sqlQuery)
 		.then((r) => {
+			console.log(r.rows || []);
 			return res.json(r.rows || []);
 		})
 		.catch((err) => {
