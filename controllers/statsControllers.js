@@ -3,7 +3,8 @@ const getHourlyStats = (req, res, next) => {
   SELECT hourly_stats.* , poi.name
   FROM public.hourly_stats
 LEFT JOIN public.poi ON public.poi.poi_id = public.hourly_stats.poi_id
-  ORDER BY date, hour;
+  ORDER BY date, hour
+  LIMIT 1008;
   `;
 	return next();
 };
