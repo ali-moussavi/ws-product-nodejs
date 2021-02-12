@@ -1,32 +1,13 @@
-Work Sample for Product Aspect, Node.js Variant
----
+About My Solution For Server-Side Rate-Limiting
 
-[What is this for?](https://github.com/EQWorks/work-samples#what-is-this)
+To solve this challenge I wrote a middleware function and I used the user’s IP address to implement rate-limiting. If our API had any sort of authentication for users, for example, an API key we could also use that to limit the number of requests a user makes in a certain time but since our API did not have that I used the user’s IP address.
 
-### Setup and Run
+For implementing the rate-limiting I used an algorithm called Sliding Window Counter. This algorithm keeps track of each user’s request count while grouping them by fixed time windows ( which is a fraction of the limit’s window). For example, if our limit for the user is 100 requests per 24 hours we can group all the requests in each one-hour together and increment the counter if the user makes another request in that one-hour timestamp. Then for determining whether the user has exceeded their limit, we retrieve all records created in the last window ( in our example 24 hours) and then sum the counters on them.
 
-The following are the recommended options, but you're free to use any means to get started.
+Besides, the records that get expired (more than 24 hours is passed since logging them) get deleted to save memory. Also, this is an accurate approach as the window is not fixed across users and is based on the user’s activity and the memory consumption is optimized since we will not log every request that the user makes and instead we group requests together in certain time fractions.
 
-#### Remote Option: Glitch.com
+It is also worth mentioning that I used Redis to keep track of each user’s request count and their IP addresses since Redis saves data on the memory and it is very fast so the rate-limiting process does not slow our API.
 
-1. [![Remix on Glitch](https://cdn.glitch.com/2703baf2-b643-4da7-ab91-7ee2a2d00b5b%2Fremix-button.svg)](https://glitch.com/edit/#!/import/github/EQWorks/ws-product-nodejs)
-2. Populate `.env` file with the environment variables given in the problem set we send to you through email
-3. Click on `Show Live` and you should see `Welcome to EQ Works 😎`
+I have implemented the rate-limiting constraint to be 30 requests per hour for each user but it can be changed easily by editing rateLimiter.js file in middleware folder.
 
-#### Local Option 1: Node.js 6.10+
-
-1. Clone this repository
-2. Install Node.js dependencies `$ npm install`
-3. Set environment variables given in the problem set we send to you through email and run `$ npm run dev`
-4. Open your browser and point to `localhost:5555` and you should see `Welcome to EQ Works 😎`
-
-#### Local Option 2: Docker (`docker-compose` needed)
-
-1. Clone this repository
-2. Create and populate `.env` file with the environment variables given in the problem set we send to you through email
-3. `$ docker-compose up` (or `$ docker-compose up -d` to run as a daemon)
-4. Open your browser and point to `localhost:5555` and you should see `Welcome to EQ Works 😎`
-
-### Notes on working through the problems
-
-Make sure any additional Node.js level dependencies are properly added in `package.json`. We encourage a healthy mixture of your own implementations, and good choices of existing open-source libraries/tools. We will comment in the problems to indicate which ones cannot be solved purely through an off-the-shelf solution.
+Live Demo: https://eqworks-ws.herokuapp.com/api
